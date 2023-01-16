@@ -7,8 +7,16 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 public class Constants {
-		
-		
+	
+	public static class GameConstants {
+		public static final int WINDOW_WIDTH = 312;
+		public static final int WINDOW_HEIGHT = 612;
+		public static final int GAME_UNIT = 30;
+		public static final int BORDER_OFFSET = 6;
+		public static final int NUMBER_OF_ROWS = 20; 
+		public static final int NUMBER_OF_COLUMNS = 10;
+		public static final int PIXELS_PER_PIECE = 4;
+	}
 	public static class Directions {
 		public static final int LEFT = -1;
 		public static final  int ROTATE = 0;
@@ -30,6 +38,8 @@ public class Constants {
 		public static final int LONGPiece = 5;
 		public static final int SQUAREPiece = 6;
 	}
+	
+
 	public static class  PixelsInPicture {
 		public static final int[][][] TPiece = 
 			{

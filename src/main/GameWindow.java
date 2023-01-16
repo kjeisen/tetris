@@ -13,6 +13,8 @@ public class GameWindow {
 		jframe.setResizable(false);
 		jframe.setLocationRelativeTo(null);
 		jframe.setVisible(true);
+		gamePanel.setVisible(true);
+		gamePanel.requestFocus();
 		
 	}
 }

@@ -2,24 +2,20 @@ package main;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Queue;
 import java.util.Random;
 
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import inputs.KeyboardInputs;
 import inputs.MouseInputs;
 import utilz.Pixel;
 import utilz.*;
+import utilz.Constants.GameConstants;
+import utilz.Constants.GameConstants.*;
 import utilz.Constants.Types;
 
-import static utilz.Constants.PlayerConstants.*;
+
 import static utilz.Constants.Directions.*;
 public class GamePanel extends JPanel {
 	private MouseInputs mouseInputs;
@@ -35,7 +31,7 @@ public class GamePanel extends JPanel {
 	private int deletedRows = 0;
 	private boolean drop;
 	private float combo = 1;
-	private int movementTick, movementWaitTime;
+	private int movementTick;
 	private boolean allowMovement = true;
 	
 	public GamePanel() {
@@ -51,7 +47,7 @@ public class GamePanel extends JPanel {
 		if(downWasPressedRecently()) return;
 		this.playerDir = DOWN;
 		this.moving = false;
-		this.currentPiece.setY(this.currentPiece.getY() + 30);
+		this.currentPiece.setY(this.currentPiece.getY() + GameConstants.GAME_UNIT);
 	}
 	public boolean drop() {
 		return drop;
@@ -81,28 +77,28 @@ public class GamePanel extends JPanel {
 		int num = new Random().nextInt((7));
 		switch(num) {
 		case Types.TPiece:
-			this.currentPiece = new Pieces(ALLPICTURES.TPiece,3,2,Types.TPiece,this.board, this);
+			this.currentPiece = new Pieces(ALLPICTURES.TPiece,3,2,Types.TPiece, this);
 			break;
 		case Types.SPiece:
-			this.currentPiece = new Pieces(ALLPICTURES.SPiece,3,2,Types.SPiece,this.board, this);
+			this.currentPiece = new Pieces(ALLPICTURES.SPiece,3,2,Types.SPiece, this);
 			break;
 		case Types.ZPiece:
-			this.currentPiece = new Pieces(ALLPICTURES.ZPiece,3,2,Types.ZPiece,this.board, this);
+			this.currentPiece = new Pieces(ALLPICTURES.ZPiece,3,2,Types.ZPiece, this);
 			break;
 		case Types.LPiece:
-			this.currentPiece = new Pieces(ALLPICTURES.LPiece,3,2,Types.LPiece,this.board, this);
+			this.currentPiece = new Pieces(ALLPICTURES.LPiece,3,2,Types.LPiece, this);
 			break;
 		case Types.LRPiece:
-			this.currentPiece = new Pieces(ALLPICTURES.LRPiece,3,2,Types.LRPiece,this.board, this);
+			this.currentPiece = new Pieces(ALLPICTURES.LRPiece,3,2,Types.LRPiece, this);
 			break;
 		case Types.LONGPiece:
-			this.currentPiece = new Pieces(ALLPICTURES.LONGPiece,1,4,Types.LONGPiece,this.board, this);
+			this.currentPiece = new Pieces(ALLPICTURES.LONGPiece,1,4,Types.LONGPiece, this);
 			break;
 		case Types.SQUAREPiece:
-			this.currentPiece = new Pieces(ALLPICTURES.SQUAREPiece,2,2,Types.SQUAREPiece,this.board, this);
+			this.currentPiece = new Pieces(ALLPICTURES.SQUAREPiece,2,2,Types.SQUAREPiece, this);
 			break;
 		default: 
-			System.out.println("SHOULDNT HAPPEN");
+			System.out.println("UH OH");
 		}
 	}
 	
@@ -114,19 +110,15 @@ public class GamePanel extends JPanel {
 	public void setDirection(int direction) {
 		this.playerDir = direction;
 		this.moving = true;
-		
-		
-		
 	}
+	
 	public void setMoving(boolean value) {
 		this.moving = value;
-		
 	}
 	public int getDirection() {
 		return playerDir;
 	}
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
+	public void gameLoop() {
 		updatePos();
 		moveDown();
 		movementTick++;
@@ -134,12 +126,21 @@ public class GamePanel extends JPanel {
 			movementTick = 0;
 			allowMovement = true;
 		}
-		g.drawImage(imgBackground, 0, 0, 312, 612,  null);
+	}
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		gameLoop();
+		g.drawImage(imgBackground, 0, 0, GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,  null);
 		g.drawImage(currentPiece.getPic(), currentPiece.getX(), currentPiece.getY(), currentPiece.getLength(), currentPiece.getHeight(),  null);
 		for(int i = 0; i < board.length; i++) {
 			for(int j = 0; j < board[0].length; j++) {
 				if(board[i][j] != null) {
-					g.drawImage(pixels[board[i][j].getPixelColor()], j * 30 + 6, i * 30 + 6, 30,30, null);
+					g.drawImage(pixels[board[i][j].getPixelColor()],
+							j * GameConstants.GAME_UNIT + GameConstants.BORDER_OFFSET,
+							i * GameConstants.GAME_UNIT + GameConstants.BORDER_OFFSET,
+							GameConstants.GAME_UNIT,
+							GameConstants.GAME_UNIT,
+							null);
 				}
 			}
 		}
@@ -150,9 +151,9 @@ public class GamePanel extends JPanel {
 		deletedRows = 0;
 		// loop through rows
 		rowloop:
-		for(int i = 19; i >= 0; i--) {
+		for(int i = GameConstants.NUMBER_OF_ROWS-1; i >= 0; i--) {
 			// go through columns
-			for(int j = 0; j < board[0].length; j++) {
+			for(int j = 0; j < GameConstants.NUMBER_OF_COLUMNS; j++) {
 				if(board[i][j] == null) 
 					continue rowloop;
 			}
@@ -165,7 +166,7 @@ public class GamePanel extends JPanel {
 				
 		}
 		for(int i = 0; i < deletedRows; i++) {	
-			board[i] = new Pixel[10];
+			board[i] = new Pixel[GameConstants.NUMBER_OF_COLUMNS];
 		}
 		if(deletedRows>0) {
 			score += 1000 * deletedRows * combo;
@@ -179,36 +180,39 @@ public class GamePanel extends JPanel {
 		}
 		
 	}
+	
 	public void updatePos() {
 		if(!allowMovement) return;
 		allowMovement = false;
 		if(moving) {
 			switch(playerDir) {
 			case LEFT:
-				this.currentPiece.setX(this.currentPiece.getX() - 30);
+				this.currentPiece.setX(this.currentPiece.getX() - GameConstants.GAME_UNIT);
 				break;
 			case RIGHT:
-				this.currentPiece.setX(this.currentPiece.getX() + 30);
+				this.currentPiece.setX(this.currentPiece.getX() + GameConstants.GAME_UNIT);
 				break;
 			case ROTATE:
 				this.currentPiece.nextOrientation();
 				break;
 			case DOWN:
-				this.currentPiece.setY(this.currentPiece.getY() + 30);
+				this.currentPiece.setY(this.currentPiece.getY() + GameConstants.GAME_UNIT);
 				break;
 			}
 		}
 		
 	}
+	
 	public void addPixel(int x, int y, int posx, int posy, int color) {
-		int xIndex = x + (posx - 6)/30;
-		int yIndex = y + (posy - 6)/30;
+		int xIndex = x + (posx - GameConstants.BORDER_OFFSET)/GameConstants.GAME_UNIT;
+		int yIndex = y + (posy - GameConstants.BORDER_OFFSET)/GameConstants.GAME_UNIT;
 		if(yIndex < 0) {
 			Game.setStop(true);
 			return;
 		}
 		this.board[yIndex][xIndex] = new Pixel(color);
 	}
+	
 	public boolean checkPosition(int x, int y) {
 		if(board[y][x] != null) return false;
 		return true;
